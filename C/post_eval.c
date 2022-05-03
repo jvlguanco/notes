@@ -5,7 +5,7 @@
 void push(int ch);
 int pop();
 
-int stack[50], top=0;
+int stack[50], top=-1;
 
 int main(){
     int a, b, c, i;
@@ -35,7 +35,7 @@ int main(){
 			push(c);
         }else{
             push(postfix[i]-48);
-			//printf("INT=%d - CHAR=%d\n",postfix[i]-48,c);
+			printf("INT=%d - CHAR=%d\n",postfix[i]-48,c);
         }
     }
 
@@ -52,6 +52,6 @@ void push(int ch){
 int pop(){
     int ch;
     ch=stack[top];
-	top=top-1;
+	top--;
 	return(ch);
 }
