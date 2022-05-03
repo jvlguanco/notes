@@ -122,11 +122,3 @@ void ToPost(char infix[], char postfix[]){
 
     postfix[j] = '\0';
 }
-
-int operand(char ch){
-    if(isdigit(ch) || isalpha(ch)){
-        return 1;
-    }else{
-        return 0;
-    }
-}
