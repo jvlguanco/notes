@@ -3,24 +3,13 @@
 #include <malloc.h>
 #include <ctype.h>
 #include <conio.h>
-
+#define MAX 50
 
 typedef struct node{
     int data;
-    struct node *left;
+    struct node *left; 
     struct node *right;
 }node;
-
-/* Helper function that allocates a new node with the given data
-and NULL left and right pointer */
-struct node *NewNode(int data){
-    struct node *node = (struct node*)malloc(sizeof(struct node));
-    node->data=data;
-    node->left=NULL;
-    node->right=NULL;
-
-    return(node);
-};
 
 void insert();
 void search();
@@ -28,9 +17,10 @@ void delete();
 void Inorder(struct node *root);
 void Preorder(struct node *root);
 void Postorder(struct node *root);
-int height(struct node *node);
-void PrintLevel(struct node *root, int level);
-void LevelOrder(struct node *root);
+node **createQueue(int*, int*);
+void enqueue(node**, int*, node*);
+node *dequeue(node**, int*);
+void printLevelOrder(node *root);
 
 node *root;
 
@@ -94,7 +84,7 @@ int main(){
             case 7:
                 system("cls");
                 printf("Level Order traversal of binary tree is \n");
-                LevelOrder(root);
+                printLevelOrder(root);
                 printf("END\n");
                 printf("Continue...");
                 getch();
@@ -125,7 +115,7 @@ void insert(){
         root->left=NULL;
         root->right=NULL;
     }else{
-        Previous = NULL;
+        Previous = NULL; 
         Current = root;
 
         while(Current!=NULL){
@@ -148,16 +138,15 @@ void insert(){
             Previous->left->left=NULL;
         }
     }
-    printf("\n%d is inserted!", NewNode->data);
+    printf("%d is inserted!", NewNode->data);
     getch();
     
-    NewNode=Previous=NULL;
+    NewNode=Previous=Current=NULL;
 }
 
 void search(){
     node *Search;
     int value, flag=0;
-    char temp;
 
     printf("What value are you searching?\n");
     printf("Enter Value: ");
@@ -185,7 +174,7 @@ void search(){
 }
 
 void delete(){
-    node *Search, *Previous, *Current, *ptr1, *ptr2;
+    node *Search, *Previous, *Current, *ptr;
     int value, flag=0;
 
     printf("What value are you deleting?\n");
@@ -194,7 +183,7 @@ void delete(){
 
     Search=root;
 
-    while(Search != NULL && flag!=1){
+    while(Search!=NULL && flag!=1){
         //node is a root and a leaf at the same time
         if(root->data==value && root->left==NULL && root->right==NULL){
             root=NULL;
@@ -230,26 +219,44 @@ void delete(){
                         Previous->left=Search->left;
                     }
                 }else{
-                    Previous->right=Search->right;
+                    if(Search->right->data > Previous->data){
+                        Previous->right=Search->right;
+                    }else{
+                        Previous->left=Search->right;
+                    }
                 }
+
+                Search->left=NULL;
+                Search->right=NULL;
+                free(Search);
+                Search=NULL;
             }else{
                 //node has two child
+                ptr = Search->left;
+                Current = Search->right;
+                
+                if(Previous->left==Search){
+                    Previous->left=Current;
 
-                ptr1=Search->right;
-                ptr2=Search->left;
-                Current=Search->right;
+                    while(Current->right!=NULL){
+                        Current=Current->right;
+                    }
 
-                while(Current->left!=NULL){
-                    Current=Current->left;
-                }
-
-                if(Search->data > Previous->data){
-                    Previous->right=ptr1;
+                    Current->left=ptr;
                 }else{
-                    Previous->left=ptr1;
+                    Previous->right=Current;
+
+                    while(Current->left!=NULL){
+                        Current=Current->left;
+                    }
+
+                    Current->left=ptr;
                 }
 
-                Current->left=ptr2;
+                Search->left=NULL;
+                Search->right=NULL;
+                free(Search);
+                Search=NULL;
             }
         }
     }
@@ -292,44 +299,40 @@ void Postorder(struct node *root){
     }
 }
 
-//Level Order Functions
-//Computes the height of the tree
-int height(struct node *node){
-    if(node!=NULL){
-        int lheight, rheight;
+//Level Order
+void printLevelOrder(node *root){
+    int rear, front;
+    node **queue = createQueue(&front, &rear);
+    node *temp = root;
 
-        lheight = height(node->left);
-        rheight = height(node->left);
+    while(temp){
+        printf("%d ", temp->data);
 
-        if(lheight > rheight){
-            return(lheight + 1);
-        }else{
-            return(rheight + 1);
+        if(temp->left){
+            enqueue(queue, &rear, temp->left);
         }
-    }else{
-        return(0);
+
+        if(temp->right){
+            enqueue(queue, &rear, temp->right);
+        }
+
+        temp = dequeue(queue, &front);
     }
 }
 
-//Displays the nodes at a current level
-void PrintLevel(struct node *root, int level){
-    if(root == NULL){
-        return;
-    }else if(level == 1){
-        printf("%d -> ", root->data);
-    }else if(level > 1){
-        PrintLevel(root->left, level-1);
-        PrintLevel(root->right, level-1);
-    }
+node **createQueue(int *front, int *rear){
+    node **queue=(node**)malloc(sizeof(node*) * MAX);
+
+    *front = *rear = 0;
+    return queue;
 }
 
-//Function to display the level order
-void LevelOrder(struct node *root){
-    int h, i;
+void enqueue(node **queue, int *rear, node *new_node){
+    queue[*rear] = new_node;
+    (*rear)++;
+}
 
-    h = height(root);
-
-    for(i=1; i<=h; i++){
-        PrintLevel(root, i);
-    }
+node *dequeue(node **queue, int *front){
+    (*front)++;
+    return queue[*front - 1];
 }
