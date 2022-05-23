@@ -36,7 +36,7 @@ void push(char ch){
     if(top >= SIZE-1){
 		printf("\nStack Overflow.");
 	}else{
-		top = top+1;
+		top++;
 		stack[top] = ch;
 	}
 }
@@ -50,13 +50,13 @@ char pop(){
         exit(1);
     }else{
         ch=stack[top];
-        top = top-1;
+        top--;
         return(ch);
     }
 }
 
 int operator(char symbol){
-    if(symbol=='^' || symbol=='*' || symbol=='/' || symbol=='+' || symbol=='-' || symbol == '$' || symbol == '#' || symbol == '(' || symbol == ')'){
+    if(symbol=='^' || symbol=='*' || symbol=='/' || symbol=='+' || symbol=='-' || symbol == '#' || symbol == '(' || symbol == ')'){
 		return 1;
 	}else{
 	    return 0;
@@ -64,14 +64,14 @@ int operator(char symbol){
 }
 
 int precedence(char symbol){
-    if(symbol == '^' || symbol == '$'){
+    if(symbol == '^'){
 		return(4);
 	}else if(symbol == '*' || symbol == '/'){
 		return(3);
 	}else if(symbol == '+' || symbol == '-'){
 		return(2);
 	}else if(symbol == '#' || symbol == '(' || symbol == ')'){
-        return(1);
+        return(1); 
     }else{
 		return(0);
 	}
@@ -87,7 +87,7 @@ char reverse(char array[SIZE]){
 
     temp[j]='\0';
     strcpy(array,temp);
-	return array;
+	return *array;
 }
 
 void ToPre(char infix[], char prefix[]){
@@ -117,7 +117,7 @@ void ToPre(char infix[], char prefix[]){
                     push(symbol);
                 }else{
                     while(precedence(stack[top]) >= precedence(symbol)){
-                        prefix[j]=pop();
+                        prefix[j]=pop(); 
 						j++;
                     }
 
@@ -127,7 +127,7 @@ void ToPre(char infix[], char prefix[]){
         }
     }
 
-    while (stack[top]!='#') {
+    while(stack[top]!='#') {
 		prefix[j]=pop();
 		j++;
 	}

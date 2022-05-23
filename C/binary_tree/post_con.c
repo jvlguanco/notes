@@ -34,7 +34,7 @@ void push(char ch){
     if(top >= SIZE-1){
 		printf("\nStack Overflow.");
 	}else{
-		top = top+1;
+		top++;
 		stack[top] = ch;
 	}
 }
@@ -48,13 +48,13 @@ char pop(){
         exit(1);
     }else{
         ch=stack[top];
-        top = top-1;
+        top--;
         return(ch);
     }
 }
 
 int operator(char symbol){
-    if(symbol=='^' || symbol=='*' || symbol=='/' || symbol=='+' || symbol=='-'){
+    if(symbol=='^' || symbol=='*' || symbol=='/' || symbol=='+' || symbol=='-' || symbol == '#' || symbol == '(' || symbol == ')'){
 		return 1;
 	}else{
 	    return 0;
@@ -63,62 +63,58 @@ int operator(char symbol){
 
 int precedence(char symbol){
     if(symbol == '^'){
-		return(3);
+		return(4);
 	}else if(symbol == '*' || symbol == '/'){
-		return(2);
+		return(3);
 	}else if(symbol == '+' || symbol == '-'){
-		return(1);
-	}else{
+		return(2);
+	}else if(symbol == '#' || symbol == '(' || symbol == ')'){
+        return(1); 
+    }else{
 		return(0);
 	}
 }
 
 void ToPost(char infix[], char postfix[]){
-    int i=0, j=0;
-    char ch, x;
+    int i, j=0;
+    char symbol;
 
-    push('('); // push '(' in the stack
-    strcat(infix,")"); // concatinate ')' in the infix expression
+    stack[++top]='#';
 
-    ch=infix[i];
+    for(i=0; i<strlen(infix); i++){
+        symbol=infix[i];
 
-    while(ch != '\0'){
-        if(ch == '('){
-            push(ch);
-        }else if(isdigit(ch) || isalpha(ch)){
-            postfix[j]=ch; // add operand symbol to postfix
-            j++;
-        }else if(operator(ch)==1){
-            x=pop();
-            while(operator(x)==1 && precedence(x)>=precedence(ch)){
-                postfix[j]=x; // pops higher precedence
-                j++;
-                x=pop(); // adds to postfix
-            }
-            push(x);
-            push(ch);
-        }else if(ch == ')'){
-            x=pop();
-            while(x != '('){
-                postfix[j]=x;
-                j++;
-                x=pop();
-            }
+        if(operator(symbol) == 0){
+            postfix[j]=symbol;
+			j++;
         }else{
-            printf("Invalid infix Expression.\n");
-            getch();
-            exit(1);
+            if(symbol=='('){
+				push(symbol);
+			}else if(symbol == ')') {
+				while (stack[top]!='('){
+					postfix[j]=pop();
+					j++;
+				}
+				pop();
+            }else{
+                if(precedence(stack[top]) <= precedence(symbol)){
+                    push(symbol);
+                }else{
+                    while(precedence(stack[top]) >= precedence(symbol)){
+                        postfix[j]=pop(); 
+						j++;
+                    }
+
+                    push(symbol);
+                }
+            }
         }
-        i++;
-
-        ch = infix[i];
     }
 
-    if(top>0){
-        printf("Invalid infix Expression.\n");
-        getch();
-        exit(1);
-    }
+    while(stack[top]!='#'){
+		postfix[j]=pop();
+		j++;
+	}
 
     postfix[j] = '\0';
 }

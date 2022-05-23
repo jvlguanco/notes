@@ -3,7 +3,7 @@
 #include <malloc.h>
 #include <ctype.h>
 #include <conio.h>
-#define MAX 50
+#define MAX 500
 
 typedef struct node{
     int data;
@@ -17,10 +17,17 @@ void delete();
 void Inorder(struct node *root);
 void Preorder(struct node *root);
 void Postorder(struct node *root);
-node **createQueue(int*, int*);
+
+//By BFS Queue
+node **Queue(int*, int*);
 void enqueue(node**, int*, node*);
 node *dequeue(node**, int*);
-void printLevelOrder(node *root);
+void PrintByQ(node *root);
+
+//By BFS Function
+void PrintByF(node *root);
+void Level(node *root, int level);
+int Height(node *node);
 
 node *root;
 
@@ -38,8 +45,9 @@ int main(){
         printf("4.\tTraverse Inorder.\n");
         printf("5.\tTraverse Preorder.\n");
         printf("6.\tTraverse Postorder.\n");
-        printf("7.\tShow Level Order.\n");
-        printf("8.\tEND\n");
+        printf("7.\tShow Level Order (By Queue).\n");
+        printf("8.\tShow Level Order (By Function).\n");
+        printf("9.\tEND\n");
         printf("-------------------------------------------\n");
         printf("Enter Selection: ");
         scanf("%d", &select);
@@ -83,13 +91,21 @@ int main(){
                 break;
             case 7:
                 system("cls");
-                printf("Level Order traversal of binary tree is \n");
-                printLevelOrder(root);
+                printf("Level Order traversal of binary tree (By Queue) is \n");
+                PrintByQ(root);
                 printf("END\n");
                 printf("Continue...");
                 getch();
                 break;
             case 8:
+                system("cls");
+                printf("Level Order traversal of binary tree (By Function) is \n");
+                PrintByF(root);
+                printf("END\n");
+                printf("Continue...");
+                getch();
+                break;
+            case 9:
                 exit(0);
             default:
                 system("CLS");
@@ -198,7 +214,6 @@ void delete(){
             flag=1;
 
             //node is a leaf
-
             if(Search->left==NULL && Search->right==NULL){
                 //node has no child
                 
@@ -209,20 +224,28 @@ void delete(){
                 }
 
                 free(Search);
+                Search=NULL;
             }else if(Search->left==NULL||Search->right==NULL){
                 //node has one child
-
-                if(Search->left!=NULL){
-                    if(Search->left->data > Previous->data){
-                        Previous->right=Search->left;
+                if(Search==root){
+                    if(Search->left!=NULL){
+                        root=Search->left;
                     }else{
-                        Previous->left=Search->left;
+                        root=Search->right;
                     }
                 }else{
-                    if(Search->right->data > Previous->data){
-                        Previous->right=Search->right;
+                    if(Search->left!=NULL){
+                        if(Search->left->data > Previous->data){
+                            Previous->right=Search->left;
+                        }else{
+                            Previous->left=Search->left;
+                        }
                     }else{
-                        Previous->left=Search->right;
+                        if(Search->right->data > Previous->data){
+                            Previous->right=Search->right;
+                        }else{
+                            Previous->left=Search->right;
+                        }
                     }
                 }
 
@@ -235,22 +258,30 @@ void delete(){
                 ptr = Search->left;
                 Current = Search->right;
                 
-                if(Previous->left==Search){
-                    Previous->left=Current;
-
-                    while(Current->right!=NULL){
-                        Current=Current->right;
-                    }
-
-                    Current->left=ptr;
-                }else{
-                    Previous->right=Current;
-
+                if(Search==root){
                     while(Current->left!=NULL){
                         Current=Current->left;
                     }
 
                     Current->left=ptr;
+                }else{
+                    if(Previous->left==Search){
+                        Previous->left=Current;
+
+                        while(Current->right!=NULL){
+                            Current=Current->right;
+                        }
+
+                        Current->left=ptr;
+                    }else{
+                        Previous->right=Current;
+
+                        while(Current->left!=NULL){
+                            Current=Current->left;
+                        }
+
+                        Current->left=ptr;
+                    }
                 }
 
                 Search->left=NULL;
@@ -299,14 +330,14 @@ void Postorder(struct node *root){
     }
 }
 
-//Level Order
-void printLevelOrder(node *root){
+//Level Order by Queue
+void PrintByQ(node *root){
     int rear, front;
-    node **queue = createQueue(&front, &rear);
+    node **queue = Queue(&front, &rear);
     node *temp = root;
 
     while(temp){
-        printf("%d ", temp->data);
+        printf("%d -> ", temp->data);
 
         if(temp->left){
             enqueue(queue, &rear, temp->left);
@@ -320,7 +351,7 @@ void printLevelOrder(node *root){
     }
 }
 
-node **createQueue(int *front, int *rear){
+node **Queue(int *front, int *rear){
     node **queue=(node**)malloc(sizeof(node*) * MAX);
 
     *front = *rear = 0;
@@ -335,4 +366,39 @@ void enqueue(node **queue, int *rear, node *new_node){
 node *dequeue(node **queue, int *front){
     (*front)++;
     return queue[*front - 1];
+}
+
+//Level Order by Function
+void PrintByF(node *root){
+    int h = Height(root);
+    int i;
+    for (i = 1; i <= h; i++)
+        Level(root, i);
+}
+
+void Level(node *root, int level){
+    if (root == NULL)
+        return;
+    if (level == 1)
+        printf("%d -> ", root->data);
+    else if (level > 1) {
+        Level(root->left, level - 1);
+        Level(root->right, level - 1);
+    }
+}
+
+int Height(node *node){
+    if (node == NULL)
+        return 0;
+    else {
+        /* compute the height of each subtree */
+        int lheight = Height(node->left);
+        int rheight = Height(node->right);
+ 
+        /* use the larger one */
+        if (lheight > rheight)
+            return (lheight + 1);
+        else
+            return (rheight + 1);
+    }
 }

@@ -21,17 +21,15 @@ int main(){
         }else if(prefix[i]=='-'){
             a=pop();
 			b=pop();
-            c=b-a;
+            c=a-b;
 			push(c);
         }else if(prefix[i]=='*'){
-            a=pop();
-			b=pop();
-            c=b*a;
+            c=pop()*pop();
 			push(c);
         }else if(prefix[i]=='/'){
             a=pop();
 			b=pop();
-            c=b/a;
+            c=a/b;
 			push(c);
         }else{
             push(prefix[i]-48);

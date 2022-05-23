@@ -29,11 +29,13 @@ int main(){
         switch(select){
             case 1:
                 system("cls");
+                top=-1;
                 prefix();
                 memset(stack, '\0', SIZE);
                 break;
             case 2:
                 system("cls");
+                top=-1;
                 postfix();
                 memset(stack, '\0', SIZE);
                 break;
@@ -51,6 +53,7 @@ void push(int ch){
 
 int pop(){
     int ch;
+    
     ch=stack[top];
 	top--;
 	return(ch);
@@ -64,27 +67,25 @@ void prefix(){
     printf("Enter Prefix Expression: ");
     gets(prefix);
 
-    for(i=strlen(prefix)-1;i>=0;i--){
+    for(i=strlen(prefix)-1;i>=0;i--){ //strlen = string length 
         if(prefix[i]=='+'){
             c=pop()+pop();
             push(c);
         }else if(prefix[i]=='-'){
             a=pop();
 			b=pop();
-            c=b-a;
+            c=a-b;
 			push(c);
         }else if(prefix[i]=='*'){
-            a=pop();
-			b=pop();
-            c=b*a;
+            c=pop()*pop();
 			push(c);
         }else if(prefix[i]=='/'){
             a=pop();
 			b=pop();
-            c=b/a;
+            c=a/b;
 			push(c);
         }else{
-            push(prefix[i]-48);
+            push(prefix[i]-48); 
 			printf("INT=%d - CHAR=%d\n",prefix[i]-48,c);
         }
     }
@@ -95,7 +96,7 @@ void prefix(){
 
 void postfix(){
     int a, b, c=0, i;
-    char postfix[50], temp;
+    char postfix[SIZE], temp;
 
     scanf("%c", &temp);
     printf("Enter Postfix Expression: ");

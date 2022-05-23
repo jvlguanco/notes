@@ -24,9 +24,7 @@ int main(){
             c=b-a;
 			push(c);
         }else if(postfix[i]=='*'){
-            a=pop();
-			b=pop();
-            c=b*a;
+            c=pop()*pop();
 			push(c);
         }else if(postfix[i]=='/'){
             a=pop();
