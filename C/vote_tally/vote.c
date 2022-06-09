@@ -44,7 +44,7 @@ int main(){
 
     printf("Enter Filename where the records will be saved: ");
     scanf("%s", &file);
-    VOTEREC = fopen(file, "w");
+    VOTEREC = fopen(file, "wb");
 
     for(i = 0; i < SIZE; i++){
         temp = candidate[i];

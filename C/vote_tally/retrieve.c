@@ -29,7 +29,7 @@ int main(){
     printf("\nRetrieving records from %s...\n\n",file);
     
     i = 0;
-    VOTEREC = fopen(file, "r");
+    VOTEREC = fopen(file, "rb");
     fread(&temp, sizeof(temp), 1, VOTEREC);
 
     while(!feof(VOTEREC)){
